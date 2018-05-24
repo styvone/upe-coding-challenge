@@ -1,6 +1,42 @@
 UPE Coding Challenge Spring 2018
+--------------------------------
 
-To run: python coding_challenge.py
+NOTE: i'm running Python 2.7.10 (sorry python 3 users)
 
-hopefully the comments are useful; also, I feel like a big issue may be my dictionary
-(newDict.txt)
+TO RUN: 
+python coding_challenge.py
+
+GENERAL STRATEGY:
+- Always guess 'a' and 'e' first.
+- Afterward, we make "educated guesses" from the current "state" string:
+	- Create a master dictionary "findShort" that keeps track of entries of the form { "selected char" : (# of '_'s) }
+	- For every word in the "state" string,
+		- Look through dictionary to find possible matching words (takes into account already-guessed characters)
+		- If we find some possible words, we append them to another list called possibleWords
+	- If possibleWords list is empty,
+		- Get the first letter out of the string MASTER = "esiarntolcdupmghbyfvkwzxqj" from left to right, that hasn't
+		been guessed already
+		- Append that letter to "findShort" dictionary
+	- Else,
+		- Create an empty dictionary called "freqList"
+		- For every word in possibleWords,
+			- For every character in that word,
+				- If that character hasn't been guessed before and is an alphabetical character,
+					- If that character is in "freqList",
+						Increment its corresponding value in "freqList"
+					- Else
+						Create an entry in "freqList" for that character with a value of 1
+		- If "freqList" is empty,
+			Continue to next word in "state" string
+		- Else,
+			- Create a list called "finalList" that will hold sorted content of "freqList" based on value
+			- Iterate through "finalList", from left to right, to get the most frequent character and add
+			it to "findShort"
+	- If "findShort" is not empty,
+		- Remove entries where the value is 0
+		- Sort the entries in ascending order
+		- Return the first entry (character with least number of '_'s)
+	- If "findShort" is empty,
+		- Return the next character in the string MASTER
+- If we lose or win a game, we look at the returned "lyrics" string and find words that weren't in our dictionary before,
+and we append these to our (growing) dictionary

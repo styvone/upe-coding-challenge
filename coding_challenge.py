@@ -60,6 +60,10 @@ def educatedGuess(stateString):
 				n = n.replace('(', '')
 			elif (m == ')'):
 				n = n.replace(')', '')
+			elif (m == '+'):
+				n = n.replace('+', '')
+			elif (m == '"'):
+				n = n.replace('"', '')
 		currentWords.append(n)
 	# get a copy of ALREADY_GUESSED characters in game
 	TEMP = ALREADY_GUESSED[:]
@@ -124,6 +128,49 @@ def educatedGuess(stateString):
 		result = mostCommon(ALREADY_GUESSED)
 	return result
 
+# function to add words not previously seen to my dictionary
+def updateDict(lyricString):
+	# a list to hold current lyrics
+	currentLyrics = []
+	# for each lyric,
+	for n in lyricString.split():
+		for m in n:
+			if (m == '.'):
+				n = n.replace('.', '')
+			elif (m == ','):
+				n = n.replace(',', '')
+			elif (m == ':'):
+				n = n.replace(':', '')
+			elif (m == '!'):
+				n = n.replace('!', '')
+			elif (m == '?'):
+				n = n.replace('?', '')
+			elif (m == ';'):
+				n = n.replace(';', '')
+			elif (m == '('):
+				n = n.replace('(', '')
+			elif (m == ')'):
+				n = n.replace(')', '')
+			elif (m == '+'):
+				n = n.replace('+', '')
+		currentLyrics.append(n)
+	# for each lyric,
+	for i in currentLyrics:
+		# flag to see if lyric is in dictionary
+		inDict = False
+		# look through dictionary for that lyric word
+		for j in open("newDict.txt", 'r'):
+			searchObj = re.search(r'^' + i + r'$', str.lower(str(j)))
+			# if we did find it in dictionary, set the flag
+			if searchObj:
+				inDict = True
+		# if we didn't find the lyric in our dictionary,
+		if inDict == False:
+			f = open("newDict.txt", 'a')
+			# append to end of dictionary
+			f.write(i+'\n')
+			f.close()
+
 # main loop
 while (True):
 	# start the game
@@ -132,6 +179,7 @@ while (True):
 	# check to see if Neo already got finessed OR is finessing
 	# if so, restart a new game to get another Neo
 	if (((playingGame['status']).encode("utf-8")) == 'DEAD' or ((playingGame['status']).encode("utf-8")) == 'FREE'):
+		updateDict((playingGame['lyrics']).encode("utf-8"))
 		continue
 	# Neo must be still ALIVE at this point --> let's make educated guesses
 	# external counter
@@ -154,9 +202,11 @@ while (True):
 		playingGame = r.json()
 		if (((playingGame['status']).encode("utf-8")) == 'DEAD'):
 			print "GAME-OVER: YOU LOST!"
+			updateDict((playingGame['lyrics']).encode("utf-8"))
 			break
 		elif (((playingGame['status']).encode("utf-8")) == 'FREE'):
 			print "GAME-OVER: YOU WON!"
+			updateDict((playingGame['lyrics']).encode("utf-8"))
 			break
 	print "Win rate: " + (str(playingGame['win_rate'])) + "\n" + "# of games played: " + (str(playingGame['games']))
 	ALREADY_GUESSED[:] = []
