@@ -119,7 +119,7 @@ def educatedGuess(stateString):
 while (True):
 	# start the game
 	r = requests.get(URL)
-	playingGame = json.loads(r.text)
+	playingGame = r.json()
 	# check to see if Neo already got finessed OR is finessing
 	# if so, restart a new game to get another Neo
 	if (str(playingGame['status']) == 'DEAD' or str(playingGame['status']) == 'FREE'):
@@ -141,7 +141,7 @@ while (True):
 		data = { "guess" : goodGuess }
 		ALREADY_GUESSED.append(goodGuess)
 		r = requests.post(URL, data)
-		playingGame = json.loads(r.text)
+		playingGame = r.json()
 		if (str(playingGame['status']) == 'DEAD'):
 			print "GAME-OVER: YOU LOST!"
 			break
