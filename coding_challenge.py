@@ -1,7 +1,6 @@
-# import the requests, re, random, string libraries
+# import the requests, re, string libraries
 import requests
 import re
-import random
 import string
 
 # API-endpoint; my awesome key is UE0XI
@@ -9,6 +8,9 @@ URL = "http://upe.42069.fun/UE0XI"
 
 # list of already-guessed characters
 ALREADY_GUESSED = []
+
+# most common letters (left to right)
+MASTER = "'esiarntolcdupmghbyfvkwzxqj'"
 
 # function to change a string like "___" to "[a-z][a-z][a-z]"
 def changeRegEx(word):
@@ -21,6 +23,12 @@ def changeRegEx(word):
 		compareMe = "[a-z]"
 	newString = re.sub("_", compareMe, str(word), 0, 0)
 	return newString
+
+# returns most common letter (takes into account the already guessed characters)
+def mostCommon():
+	for i in MASTER:
+		if i not in ALREADY_GUESSED:
+			return i
 
 # function to return educated guesses based on current state string
 def educatedGuess(stateString):
@@ -55,16 +63,12 @@ def educatedGuess(stateString):
 			# we found possible matches --> put them into possibleWords list
 			if searchObj:
 				possibleWords.append(searchObj.group())
-		# what if we dont find ANY matching words? --> should probably just mad guess at this point lmao
+		# what if we dont find ANY matching words? --> should return most common char
 		if not possibleWords:
-			while (True):
-				# get a random lower-case alphabetical character
-				c = str.lower(random.choice(string.ascii_letters))
-				# if the character hasn't been guessed before --> make an entry in findShort
-				if (c not in ALREADY_GUESSED):
-					findShort[c] = i.count("_")
-					# break out of while loop --> continue to next word in state string
-					break
+			c = mostCommon()
+			findShort[c] = i.count("_")
+			# break out of while loop --> continue to next word in state string
+			break
 		else:
 			# possibleWords is NOT empty --> we found some possible words
 			# another dictionary to store most frequent characters, calculated from possibleWords
@@ -106,8 +110,8 @@ def educatedGuess(stateString):
 		# Now, sortedList has the characters to guess in order from left to right --> just take first entry
 		result = sortedList[0]
 	else:
-		# if we don't have anything to make an educated guess from --> go random lmfao
-		result = str.lower(random.choice(string.ascii_letters))
+		# if we don't have anything to make an educated guess from --> get most common char
+		result = mostCommon()
 	return result
 
 # main loop
