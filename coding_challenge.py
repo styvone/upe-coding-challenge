@@ -1,4 +1,4 @@
-# import the requests, re, string, json, ast libraries
+# import the requests, re, string, json libraries
 import requests
 import re
 import string
@@ -7,13 +7,16 @@ import json
 # API-endpoint; my awesome key is UE0XI
 URL = "http://upe.42069.fun/UE0XI"
 
-# list of already-guessed characters
+# list of already-guessed characters in the game
 ALREADY_GUESSED = []
+
+# list of candidate letters (during each run of making an educated guess)
+TEMP = []
 
 # most common letters (left to right)
 MASTER = "esiarntolcdupmghbyfvkwzxqj"
 
-# function to change a string like "___" to "[a-z][a-z][a-z]"
+# function to change a string like "___" to "[a-z][a-z][a-z]" (reg-ex)
 def changeRegEx(word):
 	regExString = ""
 	for i in ALREADY_GUESSED:
@@ -25,40 +28,42 @@ def changeRegEx(word):
 	newString = re.sub("_", compareMe, str(word), 0, 0)
 	return newString
 
-# returns most common letter (takes into account the already guessed characters)
-def mostCommon():
+# returns next most common letter from MASTER (takes into account the already considered characters)
+def mostCommon(tempList):
 	for i in MASTER:
-		if i not in ALREADY_GUESSED:
+		if i not in tempList:
 			return i
 
-# function to return educated guesses based on current state string
+# function to return educated guesses based on current game state
 def educatedGuess(stateString):
-	# dictionary to keep track of { (# of '_'s): "selected char" }
+	# dictionary to keep track of entries of the form { "selected char": (# of '_'s) }
 	findShort = {}
-	# an array to hold our current words
+	# an array to hold our current words (from game state)
 	currentWords = []
-	# for every input word, take out ending punctuation since our dictionary doesn't recognize these
 	print "CURRENT STATE: ", stateString.split()
+	# for every input word, take out ending punctuation since our dictionary doesn't recognize these
 	for n in stateString.split():
 		for m in n:
-				if (m == '.'):
-					n = n.replace('.', '')
-				elif (m == ','):
-					n = n.replace(',', '')
-				elif (m == ':'):
-					n = n.replace(':', '')
-				elif (m == '!'):
-					n = n.replace('!', '')
-				elif (m == '?'):
-					n = n.replace('?', '')
-				elif (m == ';'):
-					n = n.replace(';', '')
-				elif (m == '('):
-					n = n.replace('(', '')
-				elif (m == ')'):
-					n = n.replace(')', '')
+			if (m == '.'):
+				n = n.replace('.', '')
+			elif (m == ','):
+				n = n.replace(',', '')
+			elif (m == ':'):
+				n = n.replace(':', '')
+			elif (m == '!'):
+				n = n.replace('!', '')
+			elif (m == '?'):
+				n = n.replace('?', '')
+			elif (m == ';'):
+				n = n.replace(';', '')
+			elif (m == '('):
+				n = n.replace('(', '')
+			elif (m == ')'):
+				n = n.replace(')', '')
 		currentWords.append(n)
-	# for every single word,
+	# get a copy of ALREADY_GUESSED characters in game
+	TEMP = ALREADY_GUESSED[:]
+	# for every single word in the game,
 	for i in currentWords:
 		# list to hold all possible words that the current word under inspection could be
 		possibleWords = []
@@ -70,11 +75,12 @@ def educatedGuess(stateString):
 				possibleWords.append(searchObj.group())
 		# what if we dont find ANY matching words? --> should return most common char
 		if not possibleWords:
-			c = mostCommon()
+			c = mostCommon(TEMP)
 			findShort[c] = i.count("_")
+			TEMP.append(c)
 		else:
 			# possibleWords is NOT empty --> we found some possible words
-			# another dictionary to store most frequent characters, calculated from possibleWords
+			# another dictionary to store most frequent characters, calculated from possibleWords list
 			freqList = {}
 			# for each possible word,
 			for q in possibleWords:
@@ -91,24 +97,22 @@ def educatedGuess(stateString):
 				continue
 			else:
 				# now, freqList contains frequency listing of all possible characters to choose from
-				# we must sort freqList to get finalList
+				# we must sort freqList --> use finalList
 				finalList = []
 				for key, value in sorted(freqList.iteritems(), key=lambda (k,v): (v,k)):
 					finalList.append(key)
 				finalList.reverse()
 				# get most frequent character from finalList and put into findShort
 				for z in finalList:
-					if (z not in ALREADY_GUESSED) and (z.isalpha()):
+					if (z not in TEMP) and (z.isalpha()):
 						findShort[z] = i.count("_")
+						TEMP.append(z)
 						break
 	if findShort:
-		print "FIND SHORT BEFORE: ", findShort
 		# remove dictionary keys with values of 0 (meaning they're already filled in)
 		for key in findShort.keys():
 			if findShort[key] == 0:
 				del findShort[key]
-
-		print "FIND SHORT AFTER: ", findShort
 		# sort the contents of the dictionary into a new list sortedList
 		sortedList = []
 		for key, value in sorted(findShort.iteritems(), key=lambda (k,v): (v,k)):
@@ -117,7 +121,7 @@ def educatedGuess(stateString):
 		result = sortedList[0]
 	else:
 		# if we don't have anything to make an educated guess from --> get most common char
-		result = mostCommon()
+		result = mostCommon(ALREADY_GUESSED)
 	return result
 
 # main loop
