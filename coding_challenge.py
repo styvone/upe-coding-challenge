@@ -53,6 +53,10 @@ def educatedGuess(stateString):
 					n = n.replace('?', '')
 				elif (m == ';'):
 					n = n.replace(';', '')
+				elif (m == '('):
+					n = n.replace('(', '')
+				elif (m == ')'):
+					n = n.replace(')', '')
 		currentWords.append(n)
 	# for every single word,
 	for i in currentWords:
@@ -98,11 +102,13 @@ def educatedGuess(stateString):
 						findShort[z] = i.count("_")
 						break
 	if findShort:
-		print "FIND SHORT: ", findShort
+		print "FIND SHORT BEFORE: ", findShort
 		# remove dictionary keys with values of 0 (meaning they're already filled in)
 		for key in findShort.keys():
 			if findShort[key] == 0:
 				del findShort[key]
+
+		print "FIND SHORT AFTER: ", findShort
 		# sort the contents of the dictionary into a new list sortedList
 		sortedList = []
 		for key, value in sorted(findShort.iteritems(), key=lambda (k,v): (v,k)):
