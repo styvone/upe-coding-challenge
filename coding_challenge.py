@@ -3,7 +3,6 @@ import requests
 import re
 import string
 import json
-import ast
 
 # API-endpoint; my awesome key is UE0XI
 URL = "http://upe.42069.fun/UE0XI"
@@ -12,7 +11,7 @@ URL = "http://upe.42069.fun/UE0XI"
 ALREADY_GUESSED = []
 
 # most common letters (left to right)
-MASTER = "'esiarntolcdupmghbyfvkwzxqj'"
+MASTER = "esiarntolcdupmghbyfvkwzxqj"
 
 # function to change a string like "___" to "[a-z][a-z][a-z]"
 def changeRegEx(word):
@@ -75,8 +74,6 @@ def educatedGuess(stateString):
 		if not possibleWords:
 			c = mostCommon()
 			findShort[c] = i.count("_")
-			# break out of while loop --> continue to next word in state string
-			break
 		else:
 			# possibleWords is NOT empty --> we found some possible words
 			# another dictionary to store most frequent characters, calculated from possibleWords
@@ -126,10 +123,7 @@ def educatedGuess(stateString):
 while (True):
 	# start the game
 	r = requests.get(URL)
-	if r.status_code != 200:
-		playingGame = ast.literal_eval((r.text).encode("utf-8"))
-	else:
-		playingGame = r.json()
+	playingGame = r.json()
 	# check to see if Neo already got finessed OR is finessing
 	# if so, restart a new game to get another Neo
 	if (((playingGame['status']).encode("utf-8")) == 'DEAD' or ((playingGame['status']).encode("utf-8")) == 'FREE'):
@@ -150,11 +144,9 @@ while (True):
 			goodGuess = educatedGuess((playingGame['state']).encode("utf-8"))
 		data = { "guess" : goodGuess }
 		ALREADY_GUESSED.append(goodGuess)
+		print "GUESS: ", goodGuess
 		r = requests.post(URL, data)
-		if r.status_code != 200:
-			playingGame = ast.literal_eval((r.text).encode("utf-8"))
-		else:
-			playingGame = r.json()
+		playingGame = r.json()
 		if (((playingGame['status']).encode("utf-8")) == 'DEAD'):
 			print "GAME-OVER: YOU LOST!"
 			break
