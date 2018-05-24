@@ -53,7 +53,13 @@ def educatedGuess(stateString):
 				elif (m == ';'):
 					n = n.replace(';', '')
 		currentWords.append(n)
-	print "CURRENT STATE: ", currentWords
+
+	# for debugging purposes...
+	printMe = []
+	for x in currentWords:
+		printMe.append(x.encode("utf-8"))
+	print "CURRENT STATE: ", printMe
+
 	# for every single word,
 	for i in currentWords:
 		# list to hold all possible words that the current word under inspection could be
@@ -122,7 +128,7 @@ while (True):
 	playingGame = r.json()
 	# check to see if Neo already got finessed OR is finessing
 	# if so, restart a new game to get another Neo
-	if (str(playingGame['status']) == 'DEAD' or str(playingGame['status']) == 'FREE'):
+	if (((playingGame['status']).encode("utf-8")) == 'DEAD' or ((playingGame['status']).encode("utf-8")) == 'FREE'):
 		continue
 	# Neo must be still ALIVE at this point --> let's make educated guesses
 	# external counter
@@ -137,16 +143,16 @@ while (True):
 			goodGuess = 'e'
 			begin += 1
 		else:
-			goodGuess = educatedGuess(str(playingGame['state']))
+			goodGuess = educatedGuess((playingGame['state']).encode("utf-8"))
 		data = { "guess" : goodGuess }
 		ALREADY_GUESSED.append(goodGuess)
 		r = requests.post(URL, data)
 		playingGame = r.json()
-		if (str(playingGame['status']) == 'DEAD'):
+		if (((playingGame['status']).encode("utf-8")) == 'DEAD'):
 			print "GAME-OVER: YOU LOST!"
 			break
-		elif (str(playingGame['status']) == 'FREE'):
+		elif (((playingGame['status']).encode("utf-8")) == 'FREE'):
 			print "GAME-OVER: YOU WON!"
 			break
-	print "Win rate: " + str(playingGame['win_rate']) + "\n" + "# of games played: " + str(playingGame['games'])
+	print "Win rate: " + (str(playingGame['win_rate'])) + "\n" + "# of games played: " + (str(playingGame['games']))
 	ALREADY_GUESSED[:] = []
