@@ -38,6 +38,7 @@ def educatedGuess(stateString):
 	# an array to hold our current words
 	currentWords = []
 	# for every input word, take out ending punctuation since our dictionary doesn't recognize these
+	print "CURRENT STATE: ", stateString.split()
 	for n in stateString.split():
 		for m in n:
 				if (m == '.'):
@@ -53,13 +54,6 @@ def educatedGuess(stateString):
 				elif (m == ';'):
 					n = n.replace(';', '')
 		currentWords.append(n)
-
-	# for debugging purposes...
-	printMe = []
-	for x in currentWords:
-		printMe.append(x.encode("utf-8"))
-	print "CURRENT STATE: ", printMe
-
 	# for every single word,
 	for i in currentWords:
 		# list to hold all possible words that the current word under inspection could be
@@ -104,6 +98,7 @@ def educatedGuess(stateString):
 						findShort[z] = i.count("_")
 						break
 	if findShort:
+		print "FIND SHORT: ", findShort
 		# remove dictionary keys with values of 0 (meaning they're already filled in)
 		for key in findShort.keys():
 			if findShort[key] == 0:
