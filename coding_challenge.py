@@ -1,8 +1,9 @@
-# import the requests, re, string, json libraries
+# import the requests, re, string, json, ast libraries
 import requests
 import re
 import string
 import json
+import ast
 
 # API-endpoint; my awesome key is UE0XI
 URL = "http://upe.42069.fun/UE0XI"
@@ -125,7 +126,10 @@ def educatedGuess(stateString):
 while (True):
 	# start the game
 	r = requests.get(URL)
-	playingGame = r.json()
+	if r.status_code != 200:
+		playingGame = ast.literal_eval((r.text).encode("utf-8"))
+	else:
+		playingGame = r.json()
 	# check to see if Neo already got finessed OR is finessing
 	# if so, restart a new game to get another Neo
 	if (((playingGame['status']).encode("utf-8")) == 'DEAD' or ((playingGame['status']).encode("utf-8")) == 'FREE'):
@@ -147,7 +151,10 @@ while (True):
 		data = { "guess" : goodGuess }
 		ALREADY_GUESSED.append(goodGuess)
 		r = requests.post(URL, data)
-		playingGame = r.json()
+		if r.status_code != 200:
+			playingGame = ast.literal_eval((r.text).encode("utf-8"))
+		else:
+			playingGame = r.json()
 		if (((playingGame['status']).encode("utf-8")) == 'DEAD'):
 			print "GAME-OVER: YOU LOST!"
 			break
