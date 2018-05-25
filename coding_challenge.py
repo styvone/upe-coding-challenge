@@ -64,6 +64,16 @@ def educatedGuess(stateString):
 				n = n.replace('+', '')
 			elif (m == '"'):
 				n = n.replace('"', '')
+			elif (m == ']'):
+				n = n.replace(']', '')
+			elif (m == '['):
+				n = n.replace('[', '')
+			elif (m == '*'):
+				n = n.replace('*', '')
+			elif (m == '}'):
+				n = n.replace('}', '')
+			elif (m == '{'):
+				n = n.replace('{', '')
 		currentWords.append(n)
 	# get a copy of ALREADY_GUESSED characters in game
 	TEMP = ALREADY_GUESSED[:]
@@ -153,6 +163,18 @@ def updateDict(lyricString):
 				n = n.replace(')', '')
 			elif (m == '+'):
 				n = n.replace('+', '')
+			elif (m == '"'):
+				n = n.replace('"', '')
+			elif (m == ']'):
+				n = n.replace(']', '')
+			elif (m == '['):
+				n = n.replace('[', '')
+			elif (m == '*'):
+				n = n.replace('*', '')
+			elif (m == '}'):
+				n = n.replace('}', '')
+			elif (m == '{'):
+				n = n.replace('{', '')
 		currentLyrics.append(n)
 	# for each lyric,
 	for i in currentLyrics:
@@ -168,7 +190,7 @@ def updateDict(lyricString):
 		if inDict == False:
 			f = open("newDict.txt", 'a')
 			# append to end of dictionary
-			f.write(i+'\n')
+			f.write((i.encode("utf-8"))+'\n')
 			f.close()
 
 # main loop

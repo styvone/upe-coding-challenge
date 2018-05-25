@@ -6,6 +6,9 @@ NOTE: i'm running Python 2.7.10 (sorry python 3 users)
 TO RUN: 
 python coding_challenge.py
 
+TO RESET:
+python reset.py
+
 GENERAL STRATEGY:
 - Always guess 'a' and 'e' first.
 - Afterward, we make "educated guesses" from the current "state" string:
