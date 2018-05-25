@@ -3,6 +3,7 @@ UPE Coding Challenge Spring 2018
 
 NOTE 1: i'm running Python 2.7.10 (sorry python 3 users)
 NOTE 2: i've included a screenshot titled "proof.png" to show that in fact, i did get a win rate of 20% for 100 games!!
+NOTE 3: there's a bug associated with missing words in the dictionary (only time can fix this, as the dictionary is constantly growing), which causes the program to crash. in this case, it's best to just restart the program. you can do this manually, or by running the included script "script.sh" to continuously run my program, regardless of any failures. (script.sh can only be exited by closing Terminal, though)
 
 TO RUN: 
 python coding_challenge.py
