@@ -1,7 +1,8 @@
 UPE Coding Challenge Spring 2018
 --------------------------------
 
-NOTE: i'm running Python 2.7.10 (sorry python 3 users)
+NOTE 1: i'm running Python 2.7.10 (sorry python 3 users)
+NOTE 2: i've included a screenshot titled "proof.png" to show that in fact, i did get a win rate of 20% for 100 games!!
 
 TO RUN: 
 python coding_challenge.py
