@@ -10,13 +10,10 @@ URL = "http://upe.42069.fun/UE0XI"
 # list of already-guessed characters in the game
 ALREADY_GUESSED = []
 
-# list of candidate letters (during each run of making an educated guess)
-TEMP = []
-
 # most common letters (left to right)
-MASTER = "esiarntolcdupmghbyfvkwzxqj"
+MASTER = "etaoinsrhldcumfpgwybvkxjqz"
 
-# function to change a string like "___" to "[a-z][a-z][a-z]" (reg-ex)
+# function to change a string like "___" to "[a-z][a-z][a-z]" (RegEx)
 def changeRegEx(word):
 	regExString = ""
 	for i in ALREADY_GUESSED:
@@ -28,17 +25,15 @@ def changeRegEx(word):
 	newString = re.sub("_", compareMe, str(word), 0, 0)
 	return newString
 
-# returns next most common letter from MASTER (takes into account the already considered characters)
-def mostCommon(tempList):
+# returns next most common letter from MASTER (takes into account the already guessed characters)
+def mostCommon():
 	for i in MASTER:
-		if i not in tempList:
+		if i not in ALREADY_GUESSED:
 			return i
 
 # function to return educated guesses based on current game state
 def educatedGuess(stateString):
-	# dictionary to keep track of entries of the form { "selected char": (# of '_'s) }
-	findShort = {}
-	# an array to hold our current words (from game state)
+	# list to hold our current words (from game state)
 	currentWords = []
 	print "CURRENT STATE: ", stateString.split()
 	# for every input word, take out ending punctuation since our dictionary doesn't recognize these
@@ -75,68 +70,46 @@ def educatedGuess(stateString):
 			elif (m == '{'):
 				n = n.replace('{', '')
 		currentWords.append(n)
-	# get a copy of ALREADY_GUESSED characters in game
-	TEMP = ALREADY_GUESSED[:]
+	# list to hold all possible words that could be in the current state string
+	possibleWords = []
 	# for every single word in the game,
 	for i in currentWords:
-		# list to hold all possible words that the current word under inspection could be
-		possibleWords = []
 		# look through entire dictionary
 		for j in open("newDict.txt", 'r'):
 			searchObj = re.search(r'^' + changeRegEx(i) + r'$', str.lower(str(j)))
 			# we found possible matches --> put them into possibleWords list
 			if searchObj:
 				possibleWords.append(searchObj.group())
-		# what if we dont find ANY matching words? --> should return most common char
-		if not possibleWords:
-			c = mostCommon(TEMP)
-			findShort[c] = i.count("_")
-			TEMP.append(c)
-		else:
-			# possibleWords is NOT empty --> we found some possible words
-			# another dictionary to store most frequent characters, calculated from possibleWords list
-			freqList = {}
-			# for each possible word,
-			for q in possibleWords:
-				# for each character in that possible word,
-				for w in q:
-					if (w not in ALREADY_GUESSED) and (w.isalpha()):
-						# add character frequencies to dict
-						if w in freqList:
-							freqList[w] += 1
-						else:
-							freqList[w] = 1
-			# CHECK TO SEE IF FREQLIST IS EMPTY --> means the word is already filled in --> go to next word in state
-			if not freqList:
-				continue
-			else:
-				# now, freqList contains frequency listing of all possible characters to choose from
-				# we must sort freqList --> use finalList
-				finalList = []
-				for key, value in sorted(freqList.iteritems(), key=lambda (k,v): (v,k)):
-					finalList.append(key)
-				finalList.reverse()
-				# get most frequent character from finalList and put into findShort
-				for z in finalList:
-					if (z not in TEMP) and (z.isalpha()):
-						findShort[z] = i.count("_")
-						TEMP.append(z)
-						break
-	if findShort:
-		# remove dictionary keys with values of 0 (meaning they're already filled in)
-		for key in findShort.keys():
-			if findShort[key] == 0:
-				del findShort[key]
-		# sort the contents of the dictionary into a new list sortedList
-		sortedList = []
-		for key, value in sorted(findShort.iteritems(), key=lambda (k,v): (v,k)):
-			sortedList.append(key)
-		# Now, sortedList has the characters to guess in order from left to right --> just take first entry
-		result = sortedList[0]
+	# what if we dont find any matching words? --> should return next most common char
+	if not possibleWords:
+		c = mostCommon()
+		return c
 	else:
-		# if we don't have anything to make an educated guess from --> get most common char
-		result = mostCommon(ALREADY_GUESSED)
-	return result
+		# possibleWords is not empty
+		# dictionary to store most frequent characters, calculated from possibleWords list
+		freqList = {}
+		# for each possible word,
+		for q in possibleWords:
+			# for each character in that possible word,
+			for w in q:
+				if (w not in ALREADY_GUESSED) and (w.isalpha()):
+					# add character frequencies to dict
+					if w in freqList:
+						freqList[w] += 1
+					else:
+						freqList[w] = 1
+		# now freqList contains frequency listing of all possible characters to choose from
+		# we must sort freqList --> put results into finalList
+		finalList = []
+		for key, value in sorted(freqList.iteritems(), key=lambda (k,v): (v,k)):
+			finalList.append(key)
+		finalList.reverse()
+		# return the most frequently appearing character (first entry in list)
+		if finalList:
+			z = finalList[0]
+		else:
+			z = mostCommon()
+		return z
 
 # function to add words not previously seen to my dictionary
 def updateDict(lyricString):
@@ -190,7 +163,7 @@ def updateDict(lyricString):
 		if inDict == False:
 			f = open("newDict.txt", 'a')
 			# append to end of dictionary
-			f.write((i.encode("utf-8"))+'\n')
+			f.write((i.decode("utf-8").encode("utf-8"))+'\n')
 			f.close()
 
 # main loop

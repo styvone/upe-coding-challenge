@@ -2,10 +2,10 @@ UPE Coding Challenge Spring 2018
 --------------------------------
 
 NOTE 1: i'm running Python 2.7.10 (sorry python 3 users)
-NOTE 2: i've included a screenshot titled "proof.png" to show that in fact, i did get a win rate of 20% for 100 games!!
-NOTE 3: there's a bug associated with missing words in the dictionary (only time can fix this, as the dictionary is constantly growing), which causes the program to crash. in this case, it's best to just restart the program. you can do this manually, or by running the included script "script.sh" to continuously run my program, regardless of any failures. (script.sh can only be exited by closing Terminal, though)
+NOTE 2: i've included a screenshot titled "proof.png" to show that in fact, i did get a win rate of 28% for 100 games!!!
+NOTE 3: there's a bug associated with unicode encoding/decoding (that hardly ever occurs), which causes the program to crash. in this case, it's best to just restart the program. you can do this manually, or by executing the included script "script.sh" to continuously run my program, regardless of any failures. (however, script.sh can only be exited by manually restarting Terminal)
 
-TO RUN: 
+TO RUN:
 python coding_challenge.py
 
 TO RESET:
@@ -13,35 +13,13 @@ python reset.py
 
 GENERAL STRATEGY:
 - Always guess 'a' and 'e' first.
-- Afterward, we make "educated guesses" from the current "state" string:
-	- Create a master dictionary "findShort" that keeps track of entries of the form { "selected char" : (# of '_'s) }
-	- For every word in the "state" string,
-		- Look through dictionary to find possible matching words (takes into account already-guessed characters)
-		- If we find some possible words, we append them to another list called possibleWords
-	- If possibleWords list is empty,
-		- Get the first letter out of the string MASTER = "esiarntolcdupmghbyfvkwzxqj" from left to right, that hasn't
-		been guessed already
-		- Append that letter to "findShort" dictionary
-	- Else,
-		- Create an empty dictionary called "freqList"
-		- For every word in possibleWords,
-			- For every character in that word,
-				- If that character hasn't been guessed before and is an alphabetical character,
-					- If that character is in "freqList",
-						Increment its corresponding value in "freqList"
-					- Else
-						Create an entry in "freqList" for that character with a value of 1
-		- If "freqList" is empty,
-			Continue to next word in "state" string
-		- Else,
-			- Create a list called "finalList" that will hold sorted content of "freqList" based on value
-			- Iterate through "finalList", from left to right, to get the most frequent character and add
-			it to "findShort"
-	- If "findShort" is not empty,
-		- Remove entries where the value is 0
-		- Sort the entries in ascending order
-		- Return the first entry (character with least number of '_'s)
-	- If "findShort" is empty,
-		- Return the next character in the string MASTER
+- Then, we try to make an educated guess:
+	- For each word in the "state" string, look through the dictionary (newDict.txt) for matching entries. If we find a matching
+	entry, we append it to a list called "possibleWords".
+	- If we don't find any possible words, then we just guess the next most common character (that hasn't been guessed before) in
+	the string "etaoinsrhldcumfpgwybvkxjqz".
+	- If we do find possible words, we create a frequency dictionary called "freqList". Then, we go through each possible word and 
+	for each character that hasn't been guessed before, we update the frequency dictionary. In essence, this creates a frequency
+	table. Then, we just guess the character with the highest frequency.
 - If we lose or win a game, we look at the returned "lyrics" string and find words that weren't in our dictionary before,
-and we append these to our (growing) dictionary
+and we append these to our (growing) dictionary.
